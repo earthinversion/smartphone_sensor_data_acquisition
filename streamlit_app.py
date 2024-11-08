@@ -5,15 +5,11 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import time
 
-# st.title("Real-Time Accelerometer Data Visualization")
-
 # Connect to SQLite database
 conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
 
-
-data_length_to_display = 60 # seconds
-sampling_rate = 50 # Hz
-
+data_length_to_display = 60  # seconds
+sampling_rate = 50  # Hz
 total_data_points = data_length_to_display * sampling_rate
 
 # Initialize session state variables
@@ -23,10 +19,11 @@ if 'data_df' not in st.session_state:
 if 'last_timestamp' not in st.session_state:
     st.session_state['last_timestamp'] = None
 
-# Create a placeholder for the chart
+# Create placeholders for the chart and battery level
 chart_placeholder = st.empty()
+battery_placeholder = st.empty()
 
-# Function to fetch new data
+# Function to fetch new accelerometer data
 def fetch_new_data():
     if st.session_state['last_timestamp'] is None:
         query = '''
@@ -45,88 +42,69 @@ def fetch_new_data():
         data_df = pd.read_sql_query(query, conn, params=(st.session_state['last_timestamp'],))
     return data_df
 
+# Function to fetch the latest battery level
+def fetch_battery_level():
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT batteryLevel FROM accelerometer_data ORDER BY loggingTime DESC LIMIT 1')
+            result = cursor.fetchone()
+            return result[0] if result else None
+    except sqlite3.OperationalError as e:
+        st.write(f"SQLite Error: {e}")
+        return None
+
 # Initialize the figure
 device_id = 'Unknown'
 identifierForVendor = 'Unknown'
-
 try:
-    with sqlite3.connect('sensor_data.db', check_same_thread=False) as conn:
+    with conn:
         cursor = conn.cursor()
         cursor.execute('SELECT DISTINCT deviceID FROM accelerometer_data')
         device_id = cursor.fetchone()[0]
         cursor.execute('SELECT DISTINCT identifierForVendor FROM accelerometer_data')
         identifierForVendor = cursor.fetchone()[0]
 except sqlite3.OperationalError as e:
-    print(f">> SQLite Error: {e}")
+    st.write(f"SQLite Error: {e}")
 
 fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                     vertical_spacing=0.02,
                     subplot_titles=(f"{device_id} ({identifierForVendor})", "", "")
                     )
 
-# Main loop to update the chart
+# Main loop to update the chart and battery level
 while True:
+    # Fetch and display the battery level
+    battery_level = fetch_battery_level()
+    if battery_level is not None:
+        battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+    
     new_data = fetch_new_data()
     if not new_data.empty:
-        # Ensure 'loggingTime' is in datetime format
         new_data['Time'] = pd.to_datetime(new_data['loggingTime'])
-
-        # Update last_timestamp
         st.session_state['last_timestamp'] = new_data['loggingTime'].max()
-
-        # Append new data to the existing DataFrame
         st.session_state['data_df'] = pd.concat(
             [st.session_state['data_df'], new_data], ignore_index=True
         )
-
-        # Keep only the latest N data points
         st.session_state['data_df'] = st.session_state['data_df'].tail(total_data_points)
 
         time_series = st.session_state['data_df']['Time']
-
-        # Clear existing traces
         fig.data = []
 
-        # Acceleration X
-        fig.add_trace(go.Scatter(
-            x=time_series,
-            y=st.session_state['data_df']['accelerometerAccelerationX'],
-            mode='lines',
-            name='Acceleration X'),
-            row=1, col=1)
+        fig.add_trace(go.Scatter(x=time_series, y=st.session_state['data_df']['accelerometerAccelerationX'], mode='lines', name='Acceleration X'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=time_series, y=st.session_state['data_df']['accelerometerAccelerationY'], mode='lines', name='Acceleration Y'), row=2, col=1)
+        fig.add_trace(go.Scatter(x=time_series, y=st.session_state['data_df']['accelerometerAccelerationZ'], mode='lines', name='Acceleration Z'), row=3, col=1)
 
-        # Acceleration Y
-        fig.add_trace(go.Scatter(
-            x=time_series,
-            y=st.session_state['data_df']['accelerometerAccelerationY'],
-            mode='lines',
-            name='Acceleration Y'),
-            row=2, col=1)
-
-        # Acceleration Z
-        fig.add_trace(go.Scatter(
-            x=time_series,
-            y=st.session_state['data_df']['accelerometerAccelerationZ'],
-            mode='lines',
-            name='Acceleration Z'),
-            row=3, col=1)
-
-        # Update layout
         fig.update_layout(height=600, showlegend=False)
-
-        # Update x-axis label
         fig.update_xaxes(row=3, col=1)
-
-        # Update y-axis labels
         fig.update_yaxes(title_text="X", row=1, col=1)
         fig.update_yaxes(title_text="Y", row=2, col=1)
         fig.update_yaxes(title_text="Z", row=3, col=1)
 
-        # Display the updated figure
         chart_placeholder.plotly_chart(fig, use_container_width=True)
     else:
         if st.session_state['data_df'].empty:
             st.write("Waiting for data...")
 
-    # Wait for a short period before updating again
-    time.sleep(0.5)
+    # Wait for the next update
+    time.sleep(10)
