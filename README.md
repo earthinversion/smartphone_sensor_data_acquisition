@@ -28,3 +28,7 @@ cd smartphone_sensor_data_acquisition
     Source: 0.0.0.0/0 (for all IP addresses) or specify a range that includes your phone’s IP address if you want to restrict access.
     ```
 1. Save the rule.
+
+
+## Access the app
+- http://54.245.66.246:5000/

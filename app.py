@@ -37,7 +37,7 @@ def start_tcp_server():
                     
                     try:
                         json_data = json.loads(json_str)
-                        print("Received data:", json_data)  # Print to console
+                        # print("Received data:", json_data)  # Print to console
                         socketio.emit('new_data', json_data)  # Send data to frontend
                     except json.JSONDecodeError:
                         continue
