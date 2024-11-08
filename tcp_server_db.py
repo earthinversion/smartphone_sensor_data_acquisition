@@ -16,6 +16,7 @@ def run_tcp_server():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 loggingTime TEXT,
                 deviceID TEXT,
+                identifierForVendor TEXT,
                 accelerometerAccelerationX REAL,
                 accelerometerAccelerationY REAL,
                 accelerometerAccelerationZ REAL
@@ -55,6 +56,7 @@ def run_tcp_server():
                             accY = json_data.get('accelerometerAccelerationY', 0.0)
                             accZ = json_data.get('accelerometerAccelerationZ', 0.0)
                             deviceID = json_data.get('deviceID', 'Unknown')
+                            identifierForVendor = json_data.get('identifierForVendor', 'Unknown')
 
                             # Insert data into SQLite database
                             try:
@@ -62,9 +64,9 @@ def run_tcp_server():
                                     conn.execute('PRAGMA journal_mode=WAL;')
                                     cursor = conn.cursor()
                                     cursor.execute('''
-                                        INSERT INTO accelerometer_data (loggingTime, deviceID, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
-                                        VALUES (?, ?, ?, ?, ?)
-                                    ''', (loggingTime, deviceID, accX, accY, accZ))
+                                        INSERT INTO accelerometer_data (loggingTime, deviceID, identifierForVendor, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
+                                        VALUES (?, ?, ?, ?, ?, ?)
+                                    ''', (loggingTime, deviceID, identifierForVendor, accX, accY, accZ))
                                     conn.commit()
                             except sqlite3.OperationalError as e:
                                 print(f">> SQLite Error: {e}")
