@@ -96,13 +96,13 @@ fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
 time_counter = 0
 battery_level, battery_level_logtime = fetch_battery_level()
 if battery_level is not None:
-    print("battery level: ",battery_level, battery_level_logtime)
     battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
 
 locationLatitude, locationLongitude = fetch_location()
 if locationLatitude is not None and locationLongitude is not None:
-    print("location: ",locationLatitude, locationLongitude)
-    location_placeholder.map(latitude = locationLatitude, longitude = locationLongitude, zoom = 15, width = 100)
+    location_df = pd.DataFrame({'lat': [locationLatitude], 'lon': [locationLongitude]})
+    location_placeholder.map(location_df, width=100, use_container_width=False, size=100)
+
 
 ## run the main loop to update the chart and battery level every xx second
 while True:
