@@ -31,6 +31,7 @@ def run_tcp_server():
             CREATE TABLE IF NOT EXISTS accelerometer_data (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 loggingTime TEXT,
+                deviceID TEXT,
                 accelerometerAccelerationX REAL,
                 accelerometerAccelerationY REAL,
                 accelerometerAccelerationZ REAL
@@ -63,11 +64,13 @@ def run_tcp_server():
 
                         try:
                             json_data = json.loads(json_str)
+                            
                             # Extract the required fields
                             loggingTime = json_data.get('loggingTime', datetime.now().isoformat())
                             accX = json_data.get('accelerometerAccelerationX', 0.0)
                             accY = json_data.get('accelerometerAccelerationY', 0.0)
                             accZ = json_data.get('accelerometerAccelerationZ', 0.0)
+                            deviceID = json_data.get('deviceID', 'Unknown')
 
                             # Insert data into SQLite database
                             try:
@@ -75,9 +78,9 @@ def run_tcp_server():
                                     conn.execute('PRAGMA journal_mode=WAL;')
                                     cursor = conn.cursor()
                                     cursor.execute('''
-                                        INSERT INTO accelerometer_data (loggingTime, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
+                                        INSERT INTO accelerometer_data (loggingTime, deviceID, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
                                         VALUES (?, ?, ?, ?)
-                                    ''', (loggingTime, accX, accY, accZ))
+                                    ''', (loggingTime, deviceID, accX, accY, accZ))
                                     conn.commit()
                             except sqlite3.OperationalError as e:
                                 print(f">> SQLite Error: {e}")
