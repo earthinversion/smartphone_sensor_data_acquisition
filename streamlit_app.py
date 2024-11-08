@@ -79,9 +79,11 @@ while True:
     if time_counter>=10:
         time_counter = 0
         battery_level = fetch_battery_level()
-        if battery_level is not None:
-            battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+        
     time_counter += 1
+    if battery_level is not None:
+        battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+
     new_data = fetch_new_data()
     if not new_data.empty:
         new_data['Time'] = pd.to_datetime(new_data['loggingTime'])
