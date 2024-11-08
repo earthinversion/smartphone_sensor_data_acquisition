@@ -85,3 +85,9 @@ streamlit run streamlit_app.py --server.port 5000
 tmux attach -t tcp_server
 tmux attach -t waveform_stream
 ```
+
+
+## References
+- https://sensorlog.berndthomas.net/
+- https://www.berndthomas.net/
+- https://apps.apple.com/us/app/sensorlog/id388014573

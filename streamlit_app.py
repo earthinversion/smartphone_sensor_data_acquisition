@@ -116,4 +116,4 @@ while True:
             st.write("Waiting for data...")
 
     # Wait for a short period before updating again
-    time.sleep(0.1)
+    time.sleep(0.5)
