@@ -47,8 +47,9 @@ def fetch_battery_level():
     try:
         with conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT batteryLevel FROM accelerometer_data ORDER BY loggingTime DESC LIMIT 1')
+            cursor.execute('SELECT batteryLevel, loggingTime FROM accelerometer_data ORDER BY loggingTime DESC LIMIT 1')
             result = cursor.fetchone()
+            print(result)
             return result[0] if result else None
     except sqlite3.OperationalError as e:
         st.write(f"SQLite Error: {e}")
