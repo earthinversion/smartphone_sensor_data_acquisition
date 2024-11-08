@@ -5,6 +5,8 @@
     <title>Real-Time Accelerometer Data Visualization</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.1.0"></script>
     <style>
         #chart-container {
             width: 80%;
@@ -90,11 +92,6 @@
             // Update the chart to render the new data
             accelerationChart.update();
         }
-
-        // Handle all current data from deque on page load
-        socket.on('all_data', (allData) => {
-            allData.forEach(updateChart);
-        });
 
         // Handle new data in real-time
         socket.on('new_data', (data) => {
