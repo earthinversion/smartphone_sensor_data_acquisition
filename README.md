@@ -1,5 +1,15 @@
 ```bash
 sudo yum install git
+
+## install redis from source
+sudo yum install -y gcc jemalloc-devel
+curl -O http://download.redis.io/redis-stable.tar.gz
+tar xzvf redis-stable.tar.gz
+cd redis-stable
+make
+sudo make install
+
+
 python3 -m venv venv
 source venv/bin/activate
 pip install pandas
