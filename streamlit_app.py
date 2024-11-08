@@ -4,6 +4,8 @@ import threading
 from collections import deque
 import streamlit as st
 import pandas as pd
+# Install streamlit-autorefresh if you haven't already
+# pip install streamlit-autorefresh
 from streamlit_autorefresh import st_autorefresh
 
 # Initialize a deque to store incoming data
@@ -78,9 +80,7 @@ if len(data_buffer) > 0:
     new_data_df = pd.DataFrame(data_list)
 
     # Append the new data to the existing DataFrame
-    st.session_state['data_df'] = pd.concat(
-        [st.session_state['data_df'], new_data_df], ignore_index=True
-    )
+    st.session_state['data_df'] = pd.concat([st.session_state['data_df'], new_data_df], ignore_index=True)
 
     # Keep only the latest N data points
     st.session_state['data_df'] = st.session_state['data_df'].tail(1000)
@@ -90,25 +90,14 @@ if not st.session_state['data_df'].empty:
     # Ensure 'loggingTime' is in datetime format
     try:
         if 'loggingTime' in st.session_state['data_df'].columns:
-            st.session_state['data_df']['Time'] = pd.to_datetime(
-                st.session_state['data_df']['loggingTime']
-            )
+            st.session_state['data_df']['Time'] = pd.to_datetime(st.session_state['data_df']['loggingTime'])
         else:
-            st.session_state['data_df']['Time'] = pd.to_datetime(
-                st.session_state['data_df']['timestamp'], unit='s'
-            )
+            st.session_state['data_df']['Time'] = pd.to_datetime(st.session_state['data_df']['timestamp'], unit='s')
     except Exception as e:
         st.error(f"Time conversion error: {e}")
 
     # Prepare data for plotting
-    chart_data = st.session_state['data_df'][
-        [
-            'Time',
-            'accelerometerAccelerationX',
-            'accelerometerAccelerationY',
-            'accelerometerAccelerationZ',
-        ]
-    ].set_index('Time')
+    chart_data = st.session_state['data_df'][['Time', 'accelerometerAccelerationX', 'accelerometerAccelerationY', 'accelerometerAccelerationZ']].set_index('Time')
 
     # Plot the data
     chart_placeholder.line_chart(chart_data)

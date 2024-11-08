@@ -1,13 +1,13 @@
 ```bash
 sudo yum install git
 
-## install redis from source
-sudo yum install -y gcc jemalloc-devel
-curl -O http://download.redis.io/redis-stable.tar.gz
-tar xzvf redis-stable.tar.gz
-cd redis-stable
-make
-sudo make install
+# ## install redis from source
+# sudo yum install -y gcc jemalloc-devel
+# curl -O http://download.redis.io/redis-stable.tar.gz
+# tar xzvf redis-stable.tar.gz
+# cd redis-stable
+# make
+# sudo make install
 
 
 python3 -m venv venv
@@ -16,6 +16,7 @@ pip install pandas
 pip install Flask Flask-SocketIO eventlet
 pip install matplotlib
 pip install streamlit
+pip install streamlit-autorefresh
 pip install sqlite3
 
 git clone https://github.com/earthinversion/smartphone_sensor_data_acquisition.git
