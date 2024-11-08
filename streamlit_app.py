@@ -73,6 +73,8 @@ if len(data_buffer) > 0:
     # Convert the list of dictionaries to a DataFrame
     new_data_df = pd.DataFrame(data_list)
 
+    print(new_data_df.head())
+
     # Append the new data to the existing DataFrame
     st.session_state['data_df'] = pd.concat([st.session_state['data_df'], new_data_df], ignore_index=True)
 
