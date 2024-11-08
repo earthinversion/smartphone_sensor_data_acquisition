@@ -42,7 +42,7 @@ def run_tcp_server():
                         except json.JSONDecodeError as e:
                             print(f"JSON Decode Error: {e}")
                             continue
-                        print(json_data)
+                        # print(json_data)
                         print(f"Data buffer size: {len(data_buffer)}")
             except Exception as e:
                 print(f"Connection error: {e}")
