@@ -74,7 +74,7 @@ pkill -f "streamlit run streamlit_app.py"
 ## Using tmux to run
 ```bash
 tmux new -s tcp_server
-python tcp_server.py
+python tcp_server_db.py
 
 tmux new -s waveform_stream
 streamlit run streamlit_app.py --server.port 5000
