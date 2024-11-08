@@ -7,10 +7,6 @@ server_ip = '0.0.0.0'  # Listens on all interfaces
 port = 56204
 data_file = "data.csv"
 
-# Initialize the CSV file with headers if it doesn't exist
-if not os.path.isfile(data_file):
-    pd.DataFrame().to_csv(data_file, index=False)
-
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((server_ip, port))
     s.listen()
@@ -42,8 +38,13 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         json_data = json.loads(json_str)  # Convert JSON string to dict
                         df = pd.DataFrame([json_data])  # Convert to DataFrame
 
-                        # Append to CSV file
-                        df.to_csv(data_file, mode='a', header=not os.path.isfile(data_file), index=False)
+                        # Check if file exists and write with or without header
+                        if not os.path.isfile(data_file):
+                            # Write with header if file doesn't exist
+                            df.to_csv(data_file, mode='w', header=True, index=False)
+                        else:
+                            # Append without header if file exists
+                            df.to_csv(data_file, mode='a', header=False, index=False)
                     
                     except json.JSONDecodeError as e:
                         print(f"JSON Decode Error: {e}")
