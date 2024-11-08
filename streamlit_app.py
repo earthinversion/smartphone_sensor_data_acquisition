@@ -73,17 +73,23 @@ fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                     )
 
 # Main loop to update the chart and battery level
+## battery level update every 10 seconds but data update every 1 second
+
+## first fetch of the battery level
 time_counter = 0
+battery_level = fetch_battery_level()
+if battery_level is not None:
+    battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+
+## run the main loop to update the chart and battery level every xx second
 while True:
     # Fetch and display the battery level
     if time_counter>=10:
         time_counter = 0
         battery_level = fetch_battery_level()
-        
+        if battery_level is not None:
+            battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
     time_counter += 1
-    if battery_level is not None:
-        battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
-
     new_data = fetch_new_data()
     if not new_data.empty:
         new_data['Time'] = pd.to_datetime(new_data['loggingTime'])
