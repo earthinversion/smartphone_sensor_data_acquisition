@@ -52,5 +52,18 @@ cd smartphone_sensor_data_acquisition
 ## Access the app
 - http://54.245.66.246:5000/
 
+## Starting and stopping the service
+```bash
+chmod +x start_services.sh
+./start_services.sh
+```
 
-streamlit run streamlit_app.py --server.port 5000
+```bash
+# Find and kill the TCP server process
+pkill -f "python tcp_server_db.py"
+
+# Find and kill the Streamlit app process
+pkill -f "streamlit run streamlit_app.py"
+
+```
+
