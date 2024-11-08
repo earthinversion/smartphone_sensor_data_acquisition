@@ -4,12 +4,13 @@ import threading
 from collections import deque
 import streamlit as st
 import pandas as pd
-import time
+from streamlit_autorefresh import st_autorefresh
 
 # Initialize a deque to store incoming data
 data_buffer = deque(maxlen=1000)  # Adjust maxlen as needed
 
 def run_tcp_server():
+    print("run_tcp_server started")
     server_ip = '0.0.0.0'  # Listens on all interfaces
     port = 56204
 
@@ -39,24 +40,25 @@ def run_tcp_server():
                         try:
                             json_data = json.loads(json_str)
                             data_buffer.append(json_data)
+                            print(f"Data buffer size: {len(data_buffer)}")
                         except json.JSONDecodeError as e:
                             print(f"JSON Decode Error: {e}")
                             continue
-                        # print(json_data)
-                        print(f"Data buffer size: {len(data_buffer)}")
             except Exception as e:
                 print(f"Connection error: {e}")
 
-@st.cache_resource
-def get_tcp_server_thread():
+# Start the TCP server (only once)
+if 'tcp_server_started' not in st.session_state:
+    st.session_state['tcp_server_started'] = True
+    print("Starting TCP server thread")
     tcp_thread = threading.Thread(target=run_tcp_server, daemon=True)
     tcp_thread.start()
-    return tcp_thread
-
-# Start the TCP server (only once)
-get_tcp_server_thread()
+    st.session_state['tcp_thread'] = tcp_thread
 
 st.title("Real-Time Accelerometer Data Visualization")
+
+# Run the autorefresh every 1 second (1000 milliseconds)
+st_autorefresh(interval=1000, key="data_refresh")
 
 # Initialize an empty DataFrame to store the data
 if 'data_df' not in st.session_state:
@@ -67,7 +69,6 @@ chart_placeholder = st.empty()
 
 # Check if there is new data in the buffer
 if len(data_buffer) > 0:
-    # print(f"Received {len(data_buffer)} new data points")
     # Transfer data from the deque to a list
     data_list = []
     while len(data_buffer) > 0:
@@ -76,10 +77,10 @@ if len(data_buffer) > 0:
     # Convert the list of dictionaries to a DataFrame
     new_data_df = pd.DataFrame(data_list)
 
-    # print(new_data_df.head())
-
     # Append the new data to the existing DataFrame
-    st.session_state['data_df'] = pd.concat([st.session_state['data_df'], new_data_df], ignore_index=True)
+    st.session_state['data_df'] = pd.concat(
+        [st.session_state['data_df'], new_data_df], ignore_index=True
+    )
 
     # Keep only the latest N data points
     st.session_state['data_df'] = st.session_state['data_df'].tail(1000)
@@ -87,17 +88,29 @@ if len(data_buffer) > 0:
 # Proceed if there's data to display
 if not st.session_state['data_df'].empty:
     # Ensure 'loggingTime' is in datetime format
-    if 'loggingTime' in st.session_state['data_df'].columns:
-        st.session_state['data_df']['Time'] = pd.to_datetime(st.session_state['data_df']['loggingTime'])
-    else:
-        st.session_state['data_df']['Time'] = pd.to_datetime(st.session_state['data_df']['timestamp'], unit='s')
+    try:
+        if 'loggingTime' in st.session_state['data_df'].columns:
+            st.session_state['data_df']['Time'] = pd.to_datetime(
+                st.session_state['data_df']['loggingTime']
+            )
+        else:
+            st.session_state['data_df']['Time'] = pd.to_datetime(
+                st.session_state['data_df']['timestamp'], unit='s'
+            )
+    except Exception as e:
+        st.error(f"Time conversion error: {e}")
 
     # Prepare data for plotting
-    chart_data = st.session_state['data_df'][['Time', 'accelerometerAccelerationX', 'accelerometerAccelerationY', 'accelerometerAccelerationZ']].set_index('Time')
+    chart_data = st.session_state['data_df'][
+        [
+            'Time',
+            'accelerometerAccelerationX',
+            'accelerometerAccelerationY',
+            'accelerometerAccelerationZ',
+        ]
+    ].set_index('Time')
 
     # Plot the data
     chart_placeholder.line_chart(chart_data)
-
-# Add a refresh mechanism
-time.sleep(1)
-st.rerun()
+else:
+    st.write("Waiting for data...")
