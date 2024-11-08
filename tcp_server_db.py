@@ -72,7 +72,7 @@ def run_tcp_server():
                                     cursor.execute('''
                                         INSERT INTO accelerometer_data (loggingTime, deviceID, identifierForVendor, batteryLevel, locationLatitude, locationLongitude, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
                                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                    ''', (loggingTime, deviceID, identifierForVendor, locationLatitude, locationLongitude, batteryLevel, accX, accY, accZ))
+                                    ''', (loggingTime, deviceID, identifierForVendor, batteryLevel, locationLatitude, locationLongitude, accX, accY, accZ))
                                     conn.commit()
                             except sqlite3.OperationalError as e:
                                 print(f">> SQLite Error: {e}")
