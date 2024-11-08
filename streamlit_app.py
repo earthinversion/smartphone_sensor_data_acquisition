@@ -20,8 +20,8 @@ if 'last_timestamp' not in st.session_state:
     st.session_state['last_timestamp'] = None
 
 # Create placeholders for the chart and battery level
-chart_placeholder = st.empty()
 battery_placeholder = st.empty()
+chart_placeholder = st.empty()
 
 # Function to fetch new accelerometer data
 def fetch_new_data():
