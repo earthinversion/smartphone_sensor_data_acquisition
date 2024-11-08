@@ -45,7 +45,8 @@ def fetch_new_data():
 # Initialize the figure
 fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                     vertical_spacing=0.02,
-                    subplot_titles=("Acceleration X", "Acceleration Y", "Acceleration Z"))
+                    # subplot_titles=("Acceleration X", "Acceleration Y", "Acceleration Z")
+                    )
 
 # Main loop to update the chart
 while True:
@@ -95,15 +96,15 @@ while True:
             row=3, col=1)
 
         # Update layout
-        fig.update_layout(height=800, showlegend=False)
+        fig.update_layout(height=600, showlegend=False)
 
         # Update x-axis label
         fig.update_xaxes(title_text="Time", row=3, col=1)
 
         # Update y-axis labels
-        fig.update_yaxes(row=1, col=1)
-        fig.update_yaxes(row=2, col=1)
-        fig.update_yaxes(row=3, col=1)
+        fig.update_yaxes(title_text="Acceleration X", row=1, col=1)
+        fig.update_yaxes(title_text="Acceleration Y", row=2, col=1)
+        fig.update_yaxes(title_text="Acceleration Z", row=3, col=1)
 
         # Display the updated figure
         chart_placeholder.plotly_chart(fig, use_container_width=True)
