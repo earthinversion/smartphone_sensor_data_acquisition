@@ -105,9 +105,9 @@ while True:
         fig.update_xaxes(row=3, col=1)
 
         # Update y-axis labels
-        fig.update_yaxes(title_text="Acceleration X", row=1, col=1)
-        fig.update_yaxes(title_text="Acceleration Y", row=2, col=1)
-        fig.update_yaxes(title_text="Acceleration Z", row=3, col=1)
+        fig.update_yaxes(title_text="X", row=1, col=1)
+        fig.update_yaxes(title_text="Y", row=2, col=1)
+        fig.update_yaxes(title_text="Z", row=3, col=1)
 
         # Display the updated figure
         chart_placeholder.plotly_chart(fig, use_container_width=True)
