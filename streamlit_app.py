@@ -65,6 +65,7 @@ chart_placeholder = st.empty()
 
 # Check if there is new data in the buffer
 if len(data_buffer) > 0:
+    print(f"Received {len(data_buffer)} new data points")
     # Transfer data from the deque to a list
     data_list = []
     while len(data_buffer) > 0:
@@ -73,7 +74,7 @@ if len(data_buffer) > 0:
     # Convert the list of dictionaries to a DataFrame
     new_data_df = pd.DataFrame(data_list)
 
-    print(new_data_df.head())
+    # print(new_data_df.head())
 
     # Append the new data to the existing DataFrame
     st.session_state['data_df'] = pd.concat([st.session_state['data_df'], new_data_df], ignore_index=True)
