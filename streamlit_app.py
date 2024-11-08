@@ -5,13 +5,13 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import time
 
-st.title("Real-Time Accelerometer Data Visualization")
+# st.title("Real-Time Accelerometer Data Visualization")
 
 # Connect to SQLite database
 conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
 
 
-total_data_points = 2000
+total_data_points = 1000
 
 # Initialize session state variables
 if 'data_df' not in st.session_state:
@@ -44,7 +44,8 @@ def fetch_new_data():
 
 # Initialize the figure
 fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
-                    vertical_spacing=0.02)
+                    vertical_spacing=0.02,
+                    subplot_titles=("Acceleration X", "Acceleration Y", "Acceleration Z"))
 
 # Main loop to update the chart
 while True:
