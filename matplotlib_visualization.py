@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import os
+import time
 
 data_file = "data.csv"
 
@@ -17,29 +19,31 @@ ax.legend()
 # Define the update function
 def update(frame):
     try:
-        # Load the CSV file
-        data = pd.read_csv(data_file)
+        # Check if data file exists and is non-empty
+        if os.path.isfile(data_file) and os.path.getsize(data_file) > 0:
+            # Load the CSV file
+            data = pd.read_csv(data_file)
 
-        # Proceed only if we have data
-        if not data.empty:
-            # Extract the necessary columns
-            x = data["loggingTime"]
-            acc_x = data["accelerometerAccelerationX"]
-            acc_y = data["accelerometerAccelerationY"]
-            acc_z = data["accelerometerAccelerationZ"]
+            # Proceed only if we have data
+            if not data.empty:
+                # Extract the necessary columns
+                x = data["loggingTime"]
+                acc_x = data["accelerometerAccelerationX"]
+                acc_y = data["accelerometerAccelerationY"]
+                acc_z = data["accelerometerAccelerationZ"]
 
-            # Update the line data
-            line_x.set_data(x, acc_x)
-            line_y.set_data(x, acc_y)
-            line_z.set_data(x, acc_z)
+                # Update the line data
+                line_x.set_data(x, acc_x)
+                line_y.set_data(x, acc_y)
+                line_z.set_data(x, acc_z)
 
-            # Rescale the plot to fit the new data
-            ax.relim()
-            ax.autoscale_view()
+                # Rescale the plot to fit the new data
+                ax.relim()
+                ax.autoscale_view()
     except Exception as e:
         print(f"Error updating plot: {e}")
 
-# Animate with a 1000 ms interval (adjust as needed)
+# Create the animation and keep a strong reference to `ani`
 ani = FuncAnimation(
     fig,
     update,
@@ -47,5 +51,5 @@ ani = FuncAnimation(
     cache_frame_data=False  # Suppress the cache warning
 )
 
-# Keep a reference to 'ani' to prevent garbage collection
+# Display the plot and keep `ani` in memory
 plt.show()
