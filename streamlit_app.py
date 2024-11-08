@@ -102,7 +102,7 @@ while True:
         fig.update_layout(height=600, showlegend=False)
 
         # Update x-axis label
-        fig.update_xaxes(title_text="Time", row=3, col=1)
+        fig.update_xaxes(row=3, col=1)
 
         # Update y-axis labels
         fig.update_yaxes(title_text="Acceleration X", row=1, col=1)
