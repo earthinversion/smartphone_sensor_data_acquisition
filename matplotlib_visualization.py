@@ -20,7 +20,7 @@ def update(frame):
         # Load the CSV file
         data = pd.read_csv(data_file)
 
-        # Plotting only if we have data
+        # Proceed only if we have data
         if not data.empty:
             # Extract the necessary columns
             x = data["loggingTime"]
@@ -40,7 +40,12 @@ def update(frame):
         print(f"Error updating plot: {e}")
 
 # Animate with a 1000 ms interval (adjust as needed)
-ani = FuncAnimation(fig, update, interval=1000)
+ani = FuncAnimation(
+    fig,
+    update,
+    interval=1000,
+    cache_frame_data=False  # Suppress the cache warning
+)
 
-# Display the plot
+# Keep a reference to 'ani' to prevent garbage collection
 plt.show()
