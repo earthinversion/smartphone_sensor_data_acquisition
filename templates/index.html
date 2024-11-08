@@ -5,8 +5,11 @@
     <title>Real-Time Accelerometer Data Visualization</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.1.0"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.0/dist/chartjs-adapter-luxon.min.js"></script>
+
     <style>
         #chart-container {
             width: 80%;
@@ -23,80 +26,112 @@
     <script>
         const socket = io();
 
-        // Create the chart with Chart.js
-        const ctx = document.getElementById('accelerationChart').getContext('2d');
-        const accelerationChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: [],  // Time labels
-                datasets: [
-                    {
-                        label: 'Acceleration X',
-                        data: [],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        fill: false,
-                    },
-                    {
-                        label: 'Acceleration Y',
-                        data: [],
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        fill: false,
-                    },
-                    {
-                        label: 'Acceleration Z',
-                        data: [],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        fill: false,
+    // Create the chart with Chart.js
+    const ctx = document.getElementById('accelerationChart').getContext('2d');
+    const accelerationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [
+                {
+                    label: 'Acceleration X',
+                    data: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                    parsing: {
+                        xAxisKey: 'time',
+                        yAxisKey: 'accX'
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        type: 'time',
-                        title: {
-                            display: true,
-                            text: 'Time'
+                },
+                {
+                    label: 'Acceleration Y',
+                    data: [],
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    fill: false,
+                    parsing: {
+                        xAxisKey: 'time',
+                        yAxisKey: 'accY'
+                    }
+                },
+                {
+                    label: 'Acceleration Z',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false,
+                    parsing: {
+                        xAxisKey: 'time',
+                        yAxisKey: 'accZ'
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        tooltipFormat: 'ff',
+                        displayFormats: {
+                            millisecond: 'HH:mm:ss.SSS',
+                            second: 'HH:mm:ss',
+                            minute: 'HH:mm',
+                            hour: 'HH:mm',
+                            day: 'MMM dd',
+                            month: 'MMM yyyy',
+                            year: 'yyyy'
                         }
                     },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Acceleration'
-                        }
+                    title: {
+                        display: true,
+                        text: 'Time'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Acceleration'
                     }
                 }
             }
-        });
+        }
+    });
 
-        // Function to update the chart with new data
-        function updateChart(data) {
-            const time = new Date();  // Use current time as timestamp
-            
-            // Add the new data to each dataset
-            accelerationChart.data.labels.push(time);
-            accelerationChart.data.datasets[0].data.push(data.accelerometerAccelerationX);
-            accelerationChart.data.datasets[1].data.push(data.accelerometerAccelerationY);
-            accelerationChart.data.datasets[2].data.push(data.accelerometerAccelerationZ);
-            
-            // Limit the number of data points shown on the chart
-            const maxDataPoints = 100;
-            if (accelerationChart.data.labels.length > maxDataPoints) {
-                accelerationChart.data.labels.shift();
-                accelerationChart.data.datasets[0].data.shift();
-                accelerationChart.data.datasets[1].data.shift();
-                accelerationChart.data.datasets[2].data.shift();
-            }
-            
-            // Update the chart to render the new data
-            accelerationChart.update();
+    // Function to update the chart with new data
+    function updateChart(data) {
+        // Parse the time from data.loggingTime
+        const time = Date.parse(data.loggingTime);
+        if (isNaN(time)) {
+            console.error('Invalid time format:', data.loggingTime);
+            return;
         }
 
-        // Handle new data in real-time
-        socket.on('new_data', (data) => {
-            updateChart(data);
+        // Create data points
+        const dataPointX = { time: time, accX: data.accelerometerAccelerationX };
+        const dataPointY = { time: time, accY: data.accelerometerAccelerationY };
+        const dataPointZ = { time: time, accZ: data.accelerometerAccelerationZ };
+
+        // Add the new data to each dataset
+        accelerationChart.data.datasets[0].data.push(dataPointX);
+        accelerationChart.data.datasets[1].data.push(dataPointY);
+        accelerationChart.data.datasets[2].data.push(dataPointZ);
+
+        // Limit the number of data points shown on the chart
+        const maxDataPoints = 100;
+        accelerationChart.data.datasets.forEach(dataset => {
+            if (dataset.data.length > maxDataPoints) {
+                dataset.data.shift();
+            }
         });
+
+        // Update the chart to render the new data
+        accelerationChart.update();
+    }
+
+    // Handle new data in real-time
+    socket.on('new_data', (data) => {
+        updateChart(data);
+    });
+
     </script>
 </body>
 </html>
