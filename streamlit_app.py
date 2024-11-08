@@ -9,7 +9,7 @@ import time
 # Initialize a deque to store incoming data
 data_buffer = deque(maxlen=1000)  # Adjust maxlen as needed
 
-def start_tcp_server():
+def run_tcp_server():
     server_ip = '0.0.0.0'  # Listens on all interfaces
     port = 56204
 
@@ -45,11 +45,14 @@ def start_tcp_server():
             except Exception as e:
                 print(f"Connection error: {e}")
 
-# Start the TCP server in a background thread
-if 'tcp_thread' not in st.session_state:
-    tcp_thread = threading.Thread(target=start_tcp_server, daemon=True)
+@st.cache_resource
+def get_tcp_server_thread():
+    tcp_thread = threading.Thread(target=run_tcp_server, daemon=True)
     tcp_thread.start()
-    st.session_state['tcp_thread'] = tcp_thread
+    return tcp_thread
+
+# Start the TCP server (only once)
+get_tcp_server_thread()
 
 st.title("Real-Time Accelerometer Data Visualization")
 
@@ -92,4 +95,4 @@ if not st.session_state['data_df'].empty:
 
 # Add a refresh mechanism
 time.sleep(1)
-st.rerun()  
+st.rerun()
