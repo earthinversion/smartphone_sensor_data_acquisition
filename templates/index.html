@@ -1,46 +1,50 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Real-Time Acceleration Data</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+    <title>Real-Time Accelerometer Data Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script> <!-- Date adapter for time-based charts -->
+    <style>
+        #chart-container {
+            width: 80%;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Real-Time Acceleration Data</h1>
-    <canvas id="accelerationChart" width="600" height="400"></canvas>
+    <h1>Real-Time Accelerometer Data Visualization</h1>
+    <div id="chart-container">
+        <canvas id="accelerationChart"></canvas>
+    </div>
 
     <script>
-        // Establish the WebSocket connection
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        const socket = io();
 
-        // Set up the Chart.js line chart
-        var ctx = document.getElementById('accelerationChart').getContext('2d');
-        var accelerationChart = new Chart(ctx, {
+        // Create the chart with Chart.js
+        const ctx = document.getElementById('accelerationChart').getContext('2d');
+        const accelerationChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [],  // This will be the time axis
+                labels: [],  // Time labels
                 datasets: [
                     {
                         label: 'Acceleration X',
                         data: [],
                         borderColor: 'rgba(255, 99, 132, 1)',
-                        fill: false  // Line-only plot without filling
+                        fill: false,
                     },
                     {
                         label: 'Acceleration Y',
                         data: [],
                         borderColor: 'rgba(54, 162, 235, 1)',
-                        fill: false
+                        fill: false,
                     },
                     {
                         label: 'Acceleration Z',
                         data: [],
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        fill: false
+                        fill: false,
                     }
                 ]
             },
@@ -52,55 +56,49 @@
                         title: {
                             display: true,
                             text: 'Time'
-                        },
-                        time: {
-                            unit: 'second'  // Display in seconds for better resolution
-                        },
-                        ticks: {
-                            source: 'auto'
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Acceleration (m/s²)'
+                            text: 'Acceleration'
                         }
                     }
                 }
             }
         });
 
-        // Function to add data to the chart
-        function addData(time, accX, accY, accZ) {
+        // Function to update the chart with new data
+        function updateChart(data) {
+            const time = new Date();  // Use current time as timestamp
+            
+            // Add the new data to each dataset
             accelerationChart.data.labels.push(time);
-            accelerationChart.data.datasets[0].data.push(accX);
-            accelerationChart.data.datasets[1].data.push(accY);
-            accelerationChart.data.datasets[2].data.push(accZ);
-
-            // Limit the chart to show only the last 2 minutes of data
-            const twoMinutesAgo = new Date(time.getTime() - 2 * 60 * 1000);  // 2 minutes in milliseconds
-            while (accelerationChart.data.labels.length > 0 && accelerationChart.data.labels[0] < twoMinutesAgo) {
+            accelerationChart.data.datasets[0].data.push(data.accelerometerAccelerationX);
+            accelerationChart.data.datasets[1].data.push(data.accelerometerAccelerationY);
+            accelerationChart.data.datasets[2].data.push(data.accelerometerAccelerationZ);
+            
+            // Limit the number of data points shown on the chart
+            const maxDataPoints = 100;
+            if (accelerationChart.data.labels.length > maxDataPoints) {
                 accelerationChart.data.labels.shift();
                 accelerationChart.data.datasets[0].data.shift();
                 accelerationChart.data.datasets[1].data.shift();
                 accelerationChart.data.datasets[2].data.shift();
             }
-
+            
+            // Update the chart to render the new data
             accelerationChart.update();
         }
 
-        // Listen for incoming data from the server
-        socket.on('new_data', function(data) {
-            console.log("New data received:", data);
+        // Handle all current data from deque on page load
+        socket.on('all_data', (allData) => {
+            allData.forEach(updateChart);
+        });
 
-            // Extract acceleration components and timestamp
-            let time = new Date(data['loggingTime'] || data['msg-time-sent']);
-            let accX = parseFloat(data['accelerometerAccelerationX']);
-            let accY = parseFloat(data['accelerometerAccelerationY']);
-            let accZ = parseFloat(data['accelerometerAccelerationZ']);
-
-            // Update the chart with new data
-            addData(time, accX, accY, accZ);
+        // Handle new data in real-time
+        socket.on('new_data', (data) => {
+            updateChart(data);
         });
     </script>
 </body>
