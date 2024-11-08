@@ -42,6 +42,7 @@ def run_tcp_server():
                         except json.JSONDecodeError as e:
                             print(f"JSON Decode Error: {e}")
                             continue
+                        print(json_data)
             except Exception as e:
                 print(f"Connection error: {e}")
 
@@ -65,7 +66,7 @@ chart_placeholder = st.empty()
 
 # Check if there is new data in the buffer
 if len(data_buffer) > 0:
-    print(f"Received {len(data_buffer)} new data points")
+    # print(f"Received {len(data_buffer)} new data points")
     # Transfer data from the deque to a list
     data_list = []
     while len(data_buffer) > 0:
