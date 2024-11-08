@@ -28,7 +28,7 @@
                         label: 'Acceleration X',
                         data: [],
                         borderColor: 'rgba(255, 99, 132, 1)',
-                        fill: false
+                        fill: false  // Line-only plot without filling
                     },
                     {
                         label: 'Acceleration Y',
@@ -48,10 +48,16 @@
                 responsive: true,
                 scales: {
                     x: {
-                        type: 'time', // Using time axis
+                        type: 'time',
                         title: {
                             display: true,
                             text: 'Time'
+                        },
+                        time: {
+                            unit: 'second'  // Display in seconds for better resolution
+                        },
+                        ticks: {
+                            source: 'auto'
                         }
                     },
                     y: {
@@ -71,8 +77,9 @@
             accelerationChart.data.datasets[1].data.push(accY);
             accelerationChart.data.datasets[2].data.push(accZ);
 
-            // Limit the number of data points to the last 50 for readability
-            if (accelerationChart.data.labels.length > 50) {
+            // Limit the chart to show only the last 2 minutes of data
+            const twoMinutesAgo = new Date(time.getTime() - 2 * 60 * 1000);  // 2 minutes in milliseconds
+            while (accelerationChart.data.labels.length > 0 && accelerationChart.data.labels[0] < twoMinutesAgo) {
                 accelerationChart.data.labels.shift();
                 accelerationChart.data.datasets[0].data.shift();
                 accelerationChart.data.datasets[1].data.shift();
