@@ -15,6 +15,9 @@ source venv/bin/activate
 pip install pandas
 pip install Flask Flask-SocketIO eventlet
 pip install matplotlib
+pip install streamlit
+pip install sqlite3
+
 git clone https://github.com/earthinversion/smartphone_sensor_data_acquisition.git
 cd smartphone_sensor_data_acquisition
 

@@ -47,7 +47,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             df.to_csv(data_file, mode='a', header=False, index=False)
                     
                     except json.JSONDecodeError as e:
-                        print(f"JSON Decode Error: {e}")
+                        # print(f"JSON Decode Error: {e}")
                         continue  # If JSON is incomplete, wait for more data
 
         except Exception as e:
