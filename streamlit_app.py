@@ -11,7 +11,10 @@ import time
 conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
 
 
-total_data_points = 1000
+data_length_to_display = 30 # seconds
+sampling_rate = 50 # Hz
+
+total_data_points = data_length_to_display * sampling_rate
 
 # Initialize session state variables
 if 'data_df' not in st.session_state:
