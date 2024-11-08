@@ -87,7 +87,7 @@ while True:
     # Fetch and display the battery level
     if time_counter>=10:
         time_counter = 0
-        battery_level = fetch_battery_level()
+        battery_level, battery_level_logtime = fetch_battery_level()
         if battery_level is not None:
             battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
     time_counter += 1
