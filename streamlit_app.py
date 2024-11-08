@@ -49,8 +49,8 @@ def fetch_battery_level():
             cursor = conn.cursor()
             cursor.execute('SELECT batteryLevel, loggingTime FROM accelerometer_data ORDER BY loggingTime DESC LIMIT 1')
             result = cursor.fetchone()
-            print(result)
-            return result[0] if result else None
+            # print(result)
+            return result if result else None
     except sqlite3.OperationalError as e:
         st.write(f"SQLite Error: {e}")
         return None
@@ -78,9 +78,9 @@ fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
 
 ## first fetch of the battery level
 time_counter = 0
-battery_level = fetch_battery_level()
+battery_level, battery_level_logtime = fetch_battery_level()
 if battery_level is not None:
-    battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+    battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
 
 ## run the main loop to update the chart and battery level every xx second
 while True:
@@ -89,7 +89,7 @@ while True:
         time_counter = 0
         battery_level = fetch_battery_level()
         if battery_level is not None:
-            battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}%")
+            battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
     time_counter += 1
     new_data = fetch_new_data()
     if not new_data.empty:
