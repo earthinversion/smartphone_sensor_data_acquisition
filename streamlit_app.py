@@ -92,4 +92,4 @@ if not st.session_state['data_df'].empty:
 
 # Add a refresh mechanism
 time.sleep(1)
-st.experimental_rerun()
+st.rerun()  

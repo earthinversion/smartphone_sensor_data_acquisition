@@ -46,3 +46,6 @@ cd smartphone_sensor_data_acquisition
 
 ## Access the app
 - http://54.245.66.246:5000/
+
+
+streamlit run streamlit_app.py --server.port 5000
