@@ -44,8 +44,7 @@ def fetch_new_data():
 
 # Initialize the figure
 fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
-                    vertical_spacing=0.02,
-                    subplot_titles=("Acceleration X", "Acceleration Y", "Acceleration Z"))
+                    vertical_spacing=0.02)
 
 # Main loop to update the chart
 while True:
