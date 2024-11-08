@@ -7,22 +7,6 @@ def run_tcp_server():
     server_ip = '0.0.0.0'  # Listens on all interfaces
     port = 56204
 
-    # Connect to SQLite database (creates if it doesn't exist)
-    # conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
-    # cursor = conn.cursor()
-
-    # Create the table if it doesn't exist
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS accelerometer_data (
-    #         id INTEGER PRIMARY KEY AUTOINCREMENT,
-    #         loggingTime TEXT,
-    #         accelerometerAccelerationX REAL,
-    #         accelerometerAccelerationY REAL,
-    #         accelerometerAccelerationZ REAL
-    #     )
-    # ''')
-    # conn.commit()
-
     with sqlite3.connect('sensor_data.db', check_same_thread=False) as conn:
         conn.execute('PRAGMA journal_mode=WAL;')
         cursor = conn.cursor()
