@@ -1,0 +1,24 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Data Visualization</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Real-Time Sensor Data</h1>
+    <div id="data">
+        Waiting for incoming data...
+    </div>
+
+    <script>
+        var socket = io();
+
+        socket.on('new_data', function(data) {
+            console.log("New data received:", data);
+            document.getElementById("data").innerHTML = JSON.stringify(data, null, 2);
+        });
+    </script>
+</body>
+</html>
