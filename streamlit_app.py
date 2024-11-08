@@ -101,7 +101,7 @@ if battery_level is not None:
 locationLatitude, locationLongitude = fetch_location()
 if locationLatitude is not None and locationLongitude is not None:
     location_df = pd.DataFrame({'lat': [locationLatitude], 'lon': [locationLongitude]})
-    location_placeholder.map(location_df, size=100, zoom=17)
+    location_placeholder.map(location_df, size=50, zoom=16)
 
 
 ## run the main loop to update the chart and battery level every xx second
