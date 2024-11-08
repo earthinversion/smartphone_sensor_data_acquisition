@@ -2,6 +2,8 @@
 
 ```bash
 sudo yum install git
+sudo yum install -y tmux
+
 
 # ## install redis from source
 # sudo yum install -y gcc jemalloc-devel
@@ -67,3 +69,19 @@ pkill -f "streamlit run streamlit_app.py"
 
 ```
 
+
+
+## Using tmux to run
+```bash
+tmux new -s tcp_server
+python tcp_server.py
+
+tmux new -s waveform_stream
+streamlit run streamlit_app.py --server.port 5000
+```
+
+- To attach again to sessions
+```bash
+tmux attach -t tcp_server
+tmux attach -t waveform_stream
+```
