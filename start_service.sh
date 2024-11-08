@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source /home/ec2-user/venv/bin/activate
 # Run the TCP server script in the background
 nohup python tcp_server_db.py > tcp_server.log 2>&1 &
 
