@@ -8,21 +8,36 @@ def run_tcp_server():
     port = 56204
 
     # Connect to SQLite database (creates if it doesn't exist)
-    conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
-    cursor = conn.cursor()
+    # conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
+    # cursor = conn.cursor()
 
     # Create the table if it doesn't exist
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS accelerometer_data (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            loggingTime TEXT,
-            accelerometerAccelerationX REAL,
-            accelerometerAccelerationY REAL,
-            accelerometerAccelerationZ REAL
-        )
-    ''')
-    conn.commit()
+    # cursor.execute('''
+    #     CREATE TABLE IF NOT EXISTS accelerometer_data (
+    #         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    #         loggingTime TEXT,
+    #         accelerometerAccelerationX REAL,
+    #         accelerometerAccelerationY REAL,
+    #         accelerometerAccelerationZ REAL
+    #     )
+    # ''')
+    # conn.commit()
 
+    with sqlite3.connect('sensor_data.db', check_same_thread=False) as conn:
+        conn.execute('PRAGMA journal_mode=WAL;')
+        cursor = conn.cursor()
+        # Create the table if it doesn't exist
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS accelerometer_data (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                loggingTime TEXT,
+                accelerometerAccelerationX REAL,
+                accelerometerAccelerationY REAL,
+                accelerometerAccelerationZ REAL
+            )
+        ''')
+        conn.commit()
+        
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((server_ip, port))
         s.listen()
@@ -55,11 +70,18 @@ def run_tcp_server():
                             accZ = json_data.get('accelerometerAccelerationZ', 0.0)
 
                             # Insert data into SQLite database
-                            cursor.execute('''
-                                INSERT INTO accelerometer_data (loggingTime, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
-                                VALUES (?, ?, ?, ?)
-                            ''', (loggingTime, accX, accY, accZ))
-                            conn.commit()
+                            try:
+                                with sqlite3.connect('sensor_data.db', check_same_thread=False) as conn:
+                                    conn.execute('PRAGMA journal_mode=WAL;')
+                                    cursor = conn.cursor()
+                                    cursor.execute('''
+                                        INSERT INTO accelerometer_data (loggingTime, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
+                                        VALUES (?, ?, ?, ?)
+                                    ''', (loggingTime, accX, accY, accZ))
+                                    conn.commit()
+                            except sqlite3.OperationalError as e:
+                                print(f">> SQLite Error: {e}")
+                                continue
 
                             # print(f"Data inserted: {loggingTime}, {accX}, {accY}, {accZ}")
 
