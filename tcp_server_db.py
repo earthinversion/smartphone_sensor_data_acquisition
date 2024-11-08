@@ -61,7 +61,7 @@ def run_tcp_server():
                             ''', (loggingTime, accX, accY, accZ))
                             conn.commit()
 
-                            print(f"Data inserted: {loggingTime}, {accX}, {accY}, {accZ}")
+                            # print(f"Data inserted: {loggingTime}, {accX}, {accY}, {accZ}")
 
                         except json.JSONDecodeError as e:
                             print(f"JSON Decode Error: {e}")

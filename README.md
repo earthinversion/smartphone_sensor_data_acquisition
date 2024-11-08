@@ -18,6 +18,8 @@ pip install matplotlib
 pip install streamlit
 pip install streamlit-autorefresh
 pip install sqlite3
+pip install plotly
+
 
 git clone https://github.com/earthinversion/smartphone_sensor_data_acquisition.git
 cd smartphone_sensor_data_acquisition
