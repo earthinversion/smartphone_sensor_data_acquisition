@@ -11,7 +11,7 @@ import time
 conn = sqlite3.connect('sensor_data.db', check_same_thread=False)
 
 
-data_length_to_display = 30 # seconds
+data_length_to_display = 60 # seconds
 sampling_rate = 50 # Hz
 
 total_data_points = data_length_to_display * sampling_rate
