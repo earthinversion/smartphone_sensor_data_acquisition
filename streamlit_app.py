@@ -46,9 +46,19 @@ def fetch_new_data():
     return data_df
 
 # Initialize the figure
+device_id = 'Unknown'
+
+try:
+    with sqlite3.connect('sensor_data.db', check_same_thread=False) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT DISTINCT deviceID FROM accelerometer_data')
+        device_id = cursor.fetchone()[0]
+except sqlite3.OperationalError as e:
+    print(f">> SQLite Error: {e}")
+
 fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
                     vertical_spacing=0.02,
-                    # subplot_titles=("Acceleration X", "Acceleration Y", "Acceleration Z")
+                    subplot_titles=(f"{device_id}", "", "")
                     )
 
 # Main loop to update the chart
