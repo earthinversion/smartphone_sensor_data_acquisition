@@ -112,6 +112,12 @@ while True:
         battery_level, battery_level_logtime = fetch_battery_level()
         if battery_level is not None:
             battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
+
+        locationLatitude, locationLongitude = fetch_location()
+        if locationLatitude is not None and locationLongitude is not None:
+            location_df = pd.DataFrame({'lat': [locationLatitude], 'lon': [locationLongitude]})
+            location_placeholder.map(location_df, size=50, zoom=15)
+            
     time_counter += 1
     new_data = fetch_new_data()
     if not new_data.empty:
