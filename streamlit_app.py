@@ -20,7 +20,9 @@ if 'last_timestamp' not in st.session_state:
     st.session_state['last_timestamp'] = None
 
 # Create placeholders for the chart and battery level
-battery_placeholder = st.empty()
+col1, col2 = st.columns(2)
+battery_placeholder = col1.empty()
+location_placeholder = col2.empty()
 chart_placeholder = st.empty()
 
 # Function to fetch new accelerometer data
@@ -55,6 +57,18 @@ def fetch_battery_level():
         st.write(f"SQLite Error: {e}")
         return None
 
+# Function to fetch the latest location
+def fetch_location():
+    try:
+        with conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT locationLatitude, locationLongitude FROM accelerometer_data ORDER BY loggingTime DESC LIMIT 1')
+            result = cursor.fetchone()
+            return result if result else None
+    except sqlite3.OperationalError as e:
+        st.write(f"SQLite Error: {e}")
+        return None
+
 # Initialize the figure
 device_id = 'Unknown'
 identifierForVendor = 'Unknown'
@@ -79,8 +93,12 @@ fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
 ## first fetch of the battery level
 time_counter = 0
 battery_level, battery_level_logtime = fetch_battery_level()
+locationLatitude, locationLongitude = fetch_location()
 if battery_level is not None:
     battery_placeholder.metric("Battery Level", f"{battery_level*100:.1f}% ({battery_level_logtime})")
+
+if locationLatitude is not None and locationLongitude is not None:
+    location_placeholder.map(locationLatitude, locationLongitude)
 
 ## run the main loop to update the chart and battery level every xx second
 while True:

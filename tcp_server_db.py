@@ -18,6 +18,8 @@ def run_tcp_server():
                 deviceID TEXT,
                 identifierForVendor TEXT,
                 batteryLevel REAL,
+                locationLatitude REAL,
+                locationLongitude REAL,
                 accelerometerAccelerationX REAL,
                 accelerometerAccelerationY REAL,
                 accelerometerAccelerationZ REAL
@@ -59,6 +61,8 @@ def run_tcp_server():
                             deviceID = json_data.get('deviceID', 'Unknown')
                             identifierForVendor = json_data.get('identifierForVendor', 'Unknown')
                             batteryLevel = json_data.get('batteryLevel', 0.0)
+                            locationLatitude = json_data.get('locationLatitude', 0.0)
+                            locationLongitude = json_data.get('locationLongitude', 0.0)
 
                             # Insert data into SQLite database
                             try:
@@ -66,9 +70,9 @@ def run_tcp_server():
                                     conn.execute('PRAGMA journal_mode=WAL;')
                                     cursor = conn.cursor()
                                     cursor.execute('''
-                                        INSERT INTO accelerometer_data (loggingTime, deviceID, identifierForVendor, batteryLevel, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
-                                        VALUES (?, ?, ?, ?, ?, ?, ?)
-                                    ''', (loggingTime, deviceID, identifierForVendor, batteryLevel, accX, accY, accZ))
+                                        INSERT INTO accelerometer_data (loggingTime, deviceID, identifierForVendor, batteryLevel, locationLatitude, locationLongitude, accelerometerAccelerationX, accelerometerAccelerationY, accelerometerAccelerationZ)
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    ''', (loggingTime, deviceID, identifierForVendor, locationLatitude, locationLongitude, batteryLevel, accX, accY, accZ))
                                     conn.commit()
                             except sqlite3.OperationalError as e:
                                 print(f">> SQLite Error: {e}")
