@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <title>Real-Time Acceleration Data</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script> <!-- Date adapter for time-based charts -->
 </head>
 <body>
     <h1>Real-Time Acceleration Data</h1>
@@ -46,7 +48,7 @@
                 responsive: true,
                 scales: {
                     x: {
-                        type: 'time',
+                        type: 'time', // Using time axis
                         title: {
                             display: true,
                             text: 'Time'
