@@ -1,5 +1,7 @@
 ## Sensorlog Realtime Visualization
 
+This is the server code to stream the acceleration and other sensor data from the SensorLog app on iPhone to a AWS EC2 instance server.
+
 ```bash
 sudo yum install git
 sudo yum install -y tmux
